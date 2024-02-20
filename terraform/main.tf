@@ -167,6 +167,8 @@ locals {
   ec2_user_data_base = <<-END_OF_FILE
 #!/bin/bash
 yum install python -y
+yum install pip -y
+pip install requests
 yum install socat -y
 
 yum install docker -y
