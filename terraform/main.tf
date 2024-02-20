@@ -178,6 +178,24 @@ systemctl start docker
 curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
+docker run --name mysql_1 \
+    -e MYSQL_ROOT_PASSWORD=lldj123414 \
+    -e TZ=Asia/Seoul \
+    -d \
+    -p 3306:3306 \
+    -v /docker_projects/mysql_1/volumns/var/lib/mysql:/var/lib/mysql \
+    --restart unless-stopped \
+    mysql \
+    --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+docker run \
+  --name=redis_1 \
+  --restart unless-stopped \
+  -p 6379:6379 \
+  -e TZ=Asia/Seoul \
+  -d \
+  redis
+
 yum install git -y
 
 sudo dd if=/dev/zero of=/swapfile bs=128M count=32
@@ -221,21 +239,10 @@ resource "aws_instance" "ec2_1" {
   user_data = <<-EOF
 ${local.ec2_user_data_base}
 
-mkdir -p /docker_projects/sb_2024_02_20_1/source
-cd /docker_projects/sb_2024_02_20_1/source
-git clone https://github.com/jhs512/sb-2024-02-20 .
+mkdir -p /docker_projects/sb_2024_02_20
+curl -o /docker_projects/sb_2024_02_20/zero_downtime_deploy.py https://raw.githubusercontent.com/jhs512/sb-2024-02-20/main/infraScript/zero_downtime_deploy.py
+chmod +x /docker_projects/sb_2024_02_20/zero_downtime_deploy.py
+/docker_projects/sb_2024_02_20/zero_downtime_deploy.py
 
-# 도커 이미지 생성
-docker build -t sb_2024_02_20_1:1 .
-
-# 생성된 이미지 실행
-docker run \
-    --name=sb_2024_02_20_1_1 \
-    -p 8080:8080 \
-    -v /docker_projects/sb_2024_02_20_1/volumes/gen:/gen \
-    --restart unless-stopped \
-    -e TZ=Asia/Seoul \
-    -d \
-    sb_2024_02_20_1:1
 EOF
 }
