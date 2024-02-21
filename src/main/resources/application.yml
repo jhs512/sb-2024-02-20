@@ -24,3 +24,8 @@ spring:
     user:
       name: user1
       password: 1234
+custom:
+  temp:
+    dirPath: c:\temp
+  gen:
+    dirPath: c:\temp\sb_2024_02_20_dev\gen
